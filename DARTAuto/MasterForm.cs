@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.Serialization;
 using DARTAuto.DisclosureInformation;
+using System.Net.Security;
+using HtmlAgilityPack;
+using System.Text.RegularExpressions;
 
 namespace DARTAuto
 {
@@ -38,6 +41,10 @@ namespace DARTAuto
             GetData();
 
             InitEvent();
+
+            searchLookUpEdit1.Properties.DataSource = Test.GetData();
+            searchLookUpEdit1.Properties.ValueMember = "corp_code";
+            searchLookUpEdit1.Properties.BestFitMode = DevExpress.XtraEditors.Controls.BestFitMode.BestFit;
         }
 
         private void LoadApiKey()
@@ -49,7 +56,13 @@ namespace DARTAuto
         {
             button1.Click += button1_Click;
             button2.Click += button2_Click;
+            gridControl1.DoubleClick += GridControl1_DoubleClick;
             dataGridView2.CellDoubleClick += dataGridView2_CellDoubleClick;
+        }
+
+        private async void GridControl1_DoubleClick(object sender, EventArgs e)
+        {
+            await OpenDocument();
         }
 
         private async Task GetReportData()
@@ -181,6 +194,29 @@ namespace DARTAuto
             }
         }
 
+        private static Dictionary<string, HashSet<string>> ExtractTagText(string html)
+        {
+            var dictionary = new Dictionary<string, HashSet<string>>();
+
+            //MatchCollection matches = Regex.Matches(html, @"<(?<tag>[\w]+)[^>]*>(?<text>.*?)<\/\k<tag>>");
+            MatchCollection matches = Regex.Matches(html, @"<(\w+)[^>]*>([^<]*)<\/\1>");
+
+            foreach (Match match in matches)
+            {
+                string tag = match.Groups[1].Value;
+                if (!dictionary.ContainsKey(tag))
+                {
+                    dictionary[tag] = new HashSet<string>();
+                }
+
+                string text = match.Groups[2].Value;
+
+                dictionary[tag].Add(text);
+            }
+
+            return dictionary;
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             GetReportData();
@@ -193,26 +229,81 @@ namespace DARTAuto
 
         private async Task OpenDocument()
         {
-            string recptNo = (dataGridView2.Rows)[0].Cells[5].Value.ToString();
+            //string recptNo = (dataGridView2.Rows)[0].Cells[5].Value.ToString();
 
-            string pathUrl = $"/dsaf001/main.do?rcpNo={recptNo}";
-            string url = _baseUrl + pathUrl;
-            HttpRequestMessage request = SetRequestMessage(HttpMethod.Get, url);
+            //string pathUrl = $"/dsaf001/main.do?rcpNo={recptNo}";
+            //string url = _baseUrl + pathUrl;
+            HttpRequestMessage request = SetRequestMessage(HttpMethod.Get, "https://dart.fss.or.kr/report/viewer.do?rcpNo=20230814002534&dcmNo=9393213&eleId=19&offset=252889&length=75647&dtd=dart3.xsd");
 
             HttpResponseMessage response = await _httpClient.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
-                MessageBox.Show(responseBody);
+
+                var htmlDocument = new HtmlAgilityPack.HtmlDocument();
+                htmlDocument.LoadHtml(responseBody);
+
+                var tr = htmlDocument.DocumentNode.SelectNodes("//tr");
+
+                var dataTable = new DataTable();
+                dataTable.Columns.Add(new DataColumn("test"));
+
+                foreach (var data in tr)
+                {
+                    var p = data.SelectNodes(".//p");
+
+                    foreach (var node in p)
+                    {
+                        string text = node.InnerText;
+                        var row = dataTable.NewRow();
+                        row["test"] = text;
+                        dataTable.Rows.Add(row);
+                    }
+                }
+
+                //foreach (var data in tr)
+                //{
+                //    string test = data.Name;
+
+                //    if (dataTable.Columns.Contains(test)) continue;
+
+                //    var column = new DataColumn(test);
+                //    dataTable.Columns.Add(column);
+
+                //    foreach (var node in data.ChildNodes)
+                //    {
+                //        var row = dataTable.NewRow();
+                //        row[test] = node.InnerText;
+                //        dataTable.Rows.Add(row);
+                //    }
+                //}
+
+                //foreach (var data in html)
+                //{
+                //    string tag = data.Key;
+                //    HashSet<string> hashSet = data.Value;
+
+                //    var column = new DataColumn(tag);
+                //    dataTable.Columns.Add(column);
+
+                //    foreach (var hash in hashSet)
+                //    {
+                //        var row = dataTable.NewRow();
+                //        row[tag] = hash;
+                //        dataTable.Rows.Add(row);
+                //    }
+                //}
+
+                gridControl2.DataSource = dataTable;
             }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            CompanyListForm companyListForm = new CompanyListForm();
+            Form1 form1 = new Form1();
 
-            DialogResult result = companyListForm.ShowDialog();
+            DialogResult result = form1.ShowDialog();
             if (result == DialogResult.OK)
             {
                 return;
@@ -258,5 +349,55 @@ namespace DARTAuto
             [DataMember(Name = "list")]
             public List<CorpData> list { get; set; }
         }
+    }
+
+    public class Test
+    {
+        private Test(int corpCode, string corpName, string stockCode, string modifyDate)
+        {
+            CorpCode = corpCode;
+            CorpName = corpName;
+            StockCode = stockCode;
+            ModifyDate = modifyDate;
+        }
+
+        public static List<Test> GetData()
+        {
+            try
+            {
+                var dataTable = new DataTable();
+                dataTable.Columns.Add("corp_code");
+                dataTable.Columns.Add("corp_name");
+                dataTable.Columns.Add("stock_code");
+                dataTable.Columns.Add("modify_date");
+
+                var xmlDoc = new XmlDocument();
+                xmlDoc.Load(Master.CorpCodePath);
+
+                var nodeList = xmlDoc.GetElementsByTagName("list");
+                var list = new List<Test>();
+                foreach (XmlNode node in nodeList)
+                {
+                    int corpCode = Convert.ToInt32(node.SelectSingleNode("corp_code").InnerText);
+                    string corpName = node.SelectSingleNode("corp_name").InnerText;
+                    string stockCode = node.SelectSingleNode("stock_code").InnerText;
+                    string modifyDate = node.SelectSingleNode("modify_date").InnerText;
+
+                    var data = new Test(corpCode, corpName, stockCode, modifyDate);
+                    list.Add(data);
+                }
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public int CorpCode { get; private set; }
+        public string CorpName { get; set; }
+        public string StockCode { get; set; }
+        public string ModifyDate { get; set; }
     }
 }

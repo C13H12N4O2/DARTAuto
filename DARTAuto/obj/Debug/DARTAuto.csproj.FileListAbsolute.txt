@@ -10,6 +10,7 @@ C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.XtraEdito
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.XtraGrid.v23.1.dll
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.XtraLayout.v23.1.dll
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.XtraPrinting.v23.1.dll
+C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\HtmlAgilityPack.dll
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\System.Memory.dll
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\System.Text.Json.dll
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.Pdf.v23.1.Core.dll
@@ -35,6 +36,8 @@ C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.XtraEdito
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.XtraGrid.v23.1.xml
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.XtraLayout.v23.1.xml
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.XtraPrinting.v23.1.xml
+C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\HtmlAgilityPack.xml
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.Pdf.v23.1.Core.xml
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.Pdf.v23.1.Drawing.xml
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.Sparkline.v23.1.Core.xml
@@ -45,6 +48,8 @@ C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\bin\Debug\DevExpress.Office.v2
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.csproj.AssemblyReference.cache
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.csproj.SuggestedBindingRedirects.cache
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.exe.config
+C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.CompanyListLookUpEditControl.resources
+C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.Form1.resources
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.MasterForm.resources
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.CompanyListForm.resources
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.Properties.Resources.resources
@@ -54,3 +59,5 @@ C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.csproj.Core
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.csproj.CopyComplete
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.exe
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.pdb
+C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.Form2.resources
+C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.Form3.resources

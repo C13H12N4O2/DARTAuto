@@ -37,16 +37,11 @@ namespace DARTAuto
         public static async Task<HttpResponseMessage> SendAsync(string url)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-            SetRequestHeaders(request);
-
-            return await httpClient.SendAsync(request);
-        }
-
-        private static void SetRequestHeaders(HttpRequestMessage request)
-        {
             request.Headers.Add("Accept", accept);
             request.Headers.Add("Accept-Encoding", AcceptEncoding);
             request.Headers.Add("User-Agent", userAgent);
+
+            return await httpClient.SendAsync(request);
         }
     }
 }

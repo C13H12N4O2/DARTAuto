@@ -136,7 +136,7 @@ namespace DARTAuto
         {
             try
             {
-                string url = Master.BaseUrl + Master.CorpCodeUrlPath;
+                string url = Master.OpenApiUrl + Master.CorpCodeUrlPath;
                 HttpResponseMessage response = await HttpMaster.SendAsync(url);
 
                 if (response.IsSuccessStatusCode)
