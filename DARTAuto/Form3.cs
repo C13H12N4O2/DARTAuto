@@ -1,4 +1,6 @@
-﻿using DevExpress.Data.Filtering;
+﻿using DevExpress.ClipboardSource.SpreadsheetML;
+using DevExpress.Data.Filtering;
+using DevExpress.XtraEditors;
 using DevExpress.XtraExport.Helpers;
 using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraGrid.Views.Grid;
@@ -7,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,10 +25,17 @@ namespace DARTAuto
         private string rcpNo = string.Empty;
         private string dcmNo = string.Empty;
 
+        private enum FinancialReport
+        {
+            재무제표 = 21,
+            연결재무제표 = 19
+        }
+
         public Form3(string rcpNo, string dcmNo)
         {
             InitializeComponent();
             SetGlobalVariables(rcpNo, dcmNo);
+            SetControls();
             SetEvent();
             OpenDocument();
         }
@@ -36,9 +46,19 @@ namespace DARTAuto
             this.dcmNo = dcmNo;
         }
 
+        private void SetControls()
+        {
+            comboBoxEdit1.Properties.Items.Add(FinancialReport.재무제표);
+            comboBoxEdit1.Properties.Items.Add(FinancialReport.연결재무제표);
+
+            comboBoxEdit1.SelectedIndex = 0;
+        }
+
         private void SetEvent()
         {
             gridView1.RowCellStyle += new RowCellStyleEventHandler(gridView1_RowCellStyle);
+            comboBoxEdit1.EditValueChanged += new EventHandler(comboBoxEdit1_EditValueChanged);
+            simpleButton1.Click += new EventHandler(simpleButton1_Click);
         }
 
         private async void OpenDocument()
@@ -48,7 +68,7 @@ namespace DARTAuto
 
         private async Task GetAsyncData()
         {
-            string eleId = "21";
+            int eleId = Convert.ToInt32(comboBoxEdit1.SelectedItem);
             string DocPathUrl = $"/report/viewer.do?rcpNo={rcpNo}&dcmNo={dcmNo}&eleId={eleId}&offset={offset}&length={length}&dtd=dart3.xsd";
             string url = Master.BaseUrl + DocPathUrl;
 
@@ -65,11 +85,18 @@ namespace DARTAuto
             var thead = htmlDocument.DocumentNode.SelectSingleNode(".//thead");
 
             var dataTable = new DataTable();
+
             var head = thead.InnerText.Replace("&nbsp;", string.Empty).Trim().Split('\n');
             foreach (var data in head) dataTable.Columns.Add(new DataColumn(data));
 
             dataTable.Columns.Add(new DataColumn("growth", typeof(int)));
             dataTable.Columns.Add(new DataColumn("growthRate", typeof(double)));
+
+            var header = table[0].SelectNodes(".//td");
+            labelControl1.Text = header[0].InnerText.Replace("&nbsp;", string.Empty);
+            labelControl2.Text = header[1].InnerText.Replace("&nbsp;", string.Empty);
+            labelControl3.Text = header[2].InnerText.Replace("&nbsp;", string.Empty);
+            labelControl4.Text = header[3].InnerText.Replace("&nbsp;", string.Empty);
 
             var tbody = table[1].SelectNodes(".//tbody");
 
@@ -131,6 +158,13 @@ namespace DARTAuto
                 gridView1.SetRowCellValue(i++, "growthRate", (left - right) / right);
             }
 
+            var gridView = gridControl1.MainView as GridView;
+
+            foreach (GridColumn column in gridView.Columns)
+            {
+                column.OptionsColumn.AllowEdit = false;
+            }
+
             gridControl1.EndUpdate();
         }
 
@@ -155,6 +189,26 @@ namespace DARTAuto
                 if (cellValue > 0) { e.Appearance.ForeColor = Color.Red; }
                 else if (cellValue == 0) { e.Appearance.ForeColor = Color.Black; }
                 else { e.Appearance.ForeColor = Color.Blue; }
+            }
+        }
+
+        private void comboBoxEdit1_EditValueChanged(object sender, EventArgs e)
+        {
+            OpenDocument();
+        }
+
+        private void simpleButton1_Click(object sender, EventArgs e)
+        {
+            string pathUrl = $"/dsaf001/main.do?rcpNo={rcpNo}";
+            string url = Master.BaseUrl + pathUrl;
+
+            try
+            {
+                Process.Start(url);
+            }
+            catch (Exception ex)
+            {
+
             }
         }
     }

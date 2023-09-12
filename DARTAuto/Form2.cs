@@ -16,22 +16,75 @@ using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using DevExpress.XtraGrid.Views.Base.Handler;
 using System.Security.Policy;
+using System.Xml;
+using System.IO;
+using DevExpress.XtraEditors;
 
 namespace DARTAuto
 {
     public partial class Form2 : Form
     {
+        private const string corp_code = "corp_code";
+        private const string corp_name = "corp_name";
+        private const string stock_code = "stock_code";
+        private const string modify_date = "modify_date";
+
         public Form2()
         {
             InitializeComponent();
+            SetControls();
             SetEvent();
+            SetCompanyGrid();
             SetReportGrid();
-            GetReportData();
+            GetCompanyData();
+        }
+
+        private void SetControls()
+        {
+            searchLookUpEdit1.Properties.NullText = string.Empty;
+            searchLookUpEdit1.Properties.DisplayMember = "corp_name";
+            searchLookUpEdit1.Properties.ValueMember = "corp_code";
         }
 
         private void SetEvent()
         {
             gridView1.DoubleClick += new EventHandler(gridView1_DoubleClick);
+            searchLookUpEdit1.EditValueChanged += new EventHandler(searchLookUpEdit1_EditValueChanged);
+        }
+
+        private void SetCompanyGrid()
+        {
+            searchLookUpEdit1.Properties.BeginUpdate();
+
+            DataTable dataTable = new DataTable();
+
+            DataColumn column = new DataColumn();
+            column.Caption = "고유번호";
+            column.ColumnName = "corp_code";
+            dataTable.Columns.Add(column);
+
+            column = new DataColumn();
+            column.Caption = "회사명";
+            column.ColumnName = "corp_name";
+            dataTable.Columns.Add(column);
+
+            column = new DataColumn();
+            column.Caption = "종목코드";
+            column.ColumnName = "stock_code";
+            dataTable.Columns.Add(column);
+
+            column = new DataColumn();
+            column.Caption = "최종변경일자";
+            column.ColumnName = "modify_date";
+            dataTable.Columns.Add(column);
+
+            dataTable.Columns["corp_code"].ColumnMapping = MappingType.Hidden;
+            dataTable.Columns["stock_code"].ColumnMapping = MappingType.Hidden;
+            dataTable.Columns["modify_date"].ColumnMapping = MappingType.Hidden;
+
+            searchLookUpEdit1.Properties.DataSource = dataTable;
+
+            searchLookUpEdit1.Properties.EndUpdate();
         }
 
         private void SetReportGrid()
@@ -118,7 +171,7 @@ namespace DARTAuto
         {
             try
             {
-                string corpCode = "00165459";
+                string corpCode = searchLookUpEdit1.EditValue.ToString();
                 string beginDate = "20150117";
                 string endDate = "20991231";
                 string pageNo = "1";
@@ -153,6 +206,33 @@ namespace DARTAuto
             }
         }
 
+        private void GetCompanyData()
+        {
+            try
+            {
+                var companyDataTable = searchLookUpEdit1.Properties.DataSource as DataTable;
+                var xmlDoc = new XmlDocument();
+                xmlDoc.Load(Master.CorpCodePath);
+
+                XmlNodeList nodeList = xmlDoc.GetElementsByTagName("list");
+                foreach (XmlNode node in nodeList)
+                {
+                    string corpCode = node.SelectSingleNode(corp_code).InnerText;
+                    string corpName = node.SelectSingleNode(corp_name).InnerText;
+                    string stockCode = node.SelectSingleNode(stock_code).InnerText;
+                    string modifyDate = node.SelectSingleNode(modify_date).InnerText;
+
+                    companyDataTable.Rows.Add(corpCode, corpName, stockCode, modifyDate);
+                }
+
+                searchLookUpEdit1.Properties.DataSource = companyDataTable;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         private async void gridView1_DoubleClick(object sender, EventArgs e)
         {
             var view = sender as GridView;
@@ -163,7 +243,7 @@ namespace DARTAuto
 
             if (!hitInfo.InRowCell) return;
 
-            var data = view.GetRowCellValue(hitInfo.RowHandle, hitInfo.Column);
+            var data = view.GetRowCellValue(hitInfo.RowHandle, "rcept_no");
 
             string pathUrl = $"/dsaf001/main.do?rcpNo={data}";
             string url = Master.BaseUrl + pathUrl;
@@ -185,6 +265,11 @@ namespace DARTAuto
 
             var form = new Form3(data.ToString(), nodeData.Value);
             form.Show();
+        }
+
+        private void searchLookUpEdit1_EditValueChanged(object sender, EventArgs e)
+        {
+            GetReportData();
         }
     }
 }
