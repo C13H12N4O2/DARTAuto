@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace DARTAuto
 {
@@ -22,8 +23,8 @@ namespace DARTAuto
         private const string length = "99999";
         private const string offset = "99999";
 
-        private string rcpNo = string.Empty;
-        private string dcmNo = string.Empty;
+        private List<Node> list;
+        private Node node = new Node();
 
         private enum FinancialReport
         {
@@ -31,19 +32,18 @@ namespace DARTAuto
             연결재무제표 = 19
         }
 
-        public Form3(string rcpNo, string dcmNo)
+        public Form3(List<Node> list)
         {
             InitializeComponent();
-            SetGlobalVariables(rcpNo, dcmNo);
+            SetGlobalVariables(list);
             SetControls();
             SetEvent();
             OpenDocument();
         }
 
-        private void SetGlobalVariables(string rcpNo, string dcmNo)
+        private void SetGlobalVariables(List<Node> list)
         {
-            this.rcpNo = rcpNo;
-            this.dcmNo = dcmNo;
+            this.list = list;
         }
 
         private void SetControls()
@@ -52,6 +52,15 @@ namespace DARTAuto
             comboBoxEdit1.Properties.Items.Add(FinancialReport.연결재무제표);
 
             comboBoxEdit1.SelectedIndex = 0;
+
+            gridView1.OptionsSelection.MultiSelect = true;
+
+            gridView1.OptionsView.ShowGroupPanel = false;
+
+            panelControl1.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            panelControl2.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            panelControl3.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            panelControl4.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
         }
 
         private void SetEvent()
@@ -68,8 +77,16 @@ namespace DARTAuto
 
         private async Task GetAsyncData()
         {
-            int eleId = Convert.ToInt32(comboBoxEdit1.SelectedItem);
-            string DocPathUrl = $"/report/viewer.do?rcpNo={rcpNo}&dcmNo={dcmNo}&eleId={eleId}&offset={offset}&length={length}&dtd=dart3.xsd";
+            foreach (var data in list)
+            {
+                if (data.text.Contains("4. 재무제표") &&
+                    (comboBoxEdit1.SelectedItem.ToString() == FinancialReport.재무제표.ToString())) { node = data; break; }
+
+                if (data.text.Contains("2. 연결재무제표") &&
+                    (comboBoxEdit1.SelectedItem.ToString() == FinancialReport.연결재무제표.ToString())) { node = data; break; }
+            }
+
+            string DocPathUrl = $"/report/viewer.do?rcpNo={node.rcpNo}&dcmNo={node.dcmNo}&eleId={node.eleId}&offset={node.offset}&length={node.length}&dtd={node.dtd}";
             string url = Master.BaseUrl + DocPathUrl;
 
             var response = await HttpMaster.SendAsync(url);
@@ -86,10 +103,27 @@ namespace DARTAuto
 
             var dataTable = new DataTable();
 
-            var head = thead.InnerText.Replace("&nbsp;", string.Empty).Trim().Split('\n');
-            foreach (var data in head) dataTable.Columns.Add(new DataColumn(data));
+            //var head = thead.InnerText.Replace("&nbsp;", string.Empty).Trim().Split('\n');
+            string head = Regex.Replace(thead.InnerText, @"^\s+|\s+$|&nbsp;", "", RegexOptions.Multiline);
+            head = Regex.Replace(head, @"\r\n+", "\r\n").Trim();
+            var heads = head.Split(new[] { 'r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (heads.Length == 2)
+            {
+                var array = new string[heads.Length + 1];
+                array[0] = "과목";
+                
+                for (int i = 0; i != heads.Length; ++i)
+                {
+                    array[i + 1] = heads[i];
+                }
 
-            dataTable.Columns.Add(new DataColumn("growth", typeof(int)));
+                heads = array;
+            }
+
+            foreach (var data in heads) dataTable.Columns.Add(new DataColumn(data));
+
+            dataTable.Columns.Add(new DataColumn("growth", typeof(long)));
             dataTable.Columns.Add(new DataColumn("growthRate", typeof(double)));
 
             var header = table[0].SelectNodes(".//td");
@@ -105,13 +139,19 @@ namespace DARTAuto
                 var tr = tbody[i].SelectNodes(".//tr");
                 foreach (var data in tr)
                 {
-                    var list = data.InnerText.Replace("&nbsp;", string.Empty).Trim().Split('\n');
+                    //var list = data.InnerText.Replace("&nbsp;", string.Empty).Replace("\r", string.Empty).Trim().Split('\n');
+                    //var list = data.InnerText.Replace("&nbsp;", string.Empty).Trim().Split('\n');
+                    
+                    string cleanedText = Regex.Replace(data.InnerText, @"^\s+|\s+$|&nbsp;", "", RegexOptions.Multiline);
+                    cleanedText = Regex.Replace(cleanedText, @"\r\n+", "\r\n").Trim();
+                    var list = cleanedText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
                     var row = dataTable.NewRow();
                     for (int j = 0; j != list.Length; ++j)
                     {
                         var text = list[j];
                         if (string.IsNullOrEmpty(text)) continue;
-                        row[head[j]] = text;
+                        row[heads[j]] = text;
                     }
 
                     dataTable.Rows.Add(row);
@@ -138,21 +178,21 @@ namespace DARTAuto
             int i = 0;
             foreach (DataRow row in (gridControl1.DataSource as DataTable).Rows)
             {
-                string test1 = Convert.ToString(row.ItemArray[2]);
-                string test2 = Convert.ToString(row.ItemArray[3]);
+                string test1 = Convert.ToString(row.ItemArray[row.ItemArray.Length - 4]);
+                string test2 = Convert.ToString(row.ItemArray[row.ItemArray.Length - 3]);
 
-                if (Convert.ToString(row.ItemArray[2]).Contains("-") ||
-                    Convert.ToString(row.ItemArray[3]).Contains("-") ||
-                    Convert.ToString(row.ItemArray[2]).Contains("(") ||
-                    Convert.ToString(row.ItemArray[3]).Contains("(") ||
-                    Convert.ToString(row.ItemArray[2]) == string.Empty ||
-                    Convert.ToString(row.ItemArray[3]) == string.Empty)
+                if (Convert.ToString(row.ItemArray[row.ItemArray.Length - 4]).Contains("-") ||
+                    Convert.ToString(row.ItemArray[row.ItemArray.Length - 3]).Contains("-") ||
+                    Convert.ToString(row.ItemArray[row.ItemArray.Length - 4]).Contains("(") ||
+                    Convert.ToString(row.ItemArray[row.ItemArray.Length - 3]).Contains("(") ||
+                    Convert.ToString(row.ItemArray[row.ItemArray.Length - 4]) == string.Empty ||
+                    Convert.ToString(row.ItemArray[row.ItemArray.Length - 3]) == string.Empty)
                 {
                     ++i;
                     continue;
                 }
-                double left = Convert.ToDouble(row.ItemArray[2]);
-                double right = Convert.ToDouble(row.ItemArray[3]);
+                double left = Convert.ToDouble(row.ItemArray[row.ItemArray.Length - 4]);
+                double right = Convert.ToDouble(row.ItemArray[row.ItemArray.Length - 3]);
 
                 gridView1.SetRowCellValue(i, "growth", left - right);
                 gridView1.SetRowCellValue(i++, "growthRate", (left - right) / right);
@@ -176,7 +216,7 @@ namespace DARTAuto
             {
                 if (e.CellValue == null || string.IsNullOrEmpty(e.CellValue.ToString())) return;
 
-                int cellValue = Convert.ToInt32(e.CellValue);
+                long cellValue = Convert.ToInt64(e.CellValue);
                 if (cellValue > 0) {        e.Appearance.ForeColor = Color.Red; }
                 else if (cellValue == 0) {  e.Appearance.ForeColor = Color.Black; }
                 else {                      e.Appearance.ForeColor = Color.Blue; }
@@ -199,7 +239,7 @@ namespace DARTAuto
 
         private void simpleButton1_Click(object sender, EventArgs e)
         {
-            string pathUrl = $"/dsaf001/main.do?rcpNo={rcpNo}";
+            string pathUrl = $"/dsaf001/main.do?rcpNo={node.rcpNo}";
             string url = Master.BaseUrl + pathUrl;
 
             try

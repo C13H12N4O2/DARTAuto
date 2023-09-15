@@ -19,6 +19,7 @@ using System.Security.Policy;
 using System.Xml;
 using System.IO;
 using DevExpress.XtraEditors;
+using HtmlAgilityPack;
 
 namespace DARTAuto
 {
@@ -44,6 +45,10 @@ namespace DARTAuto
             searchLookUpEdit1.Properties.NullText = string.Empty;
             searchLookUpEdit1.Properties.DisplayMember = "corp_name";
             searchLookUpEdit1.Properties.ValueMember = "corp_code";
+
+            gridView1.OptionsView.ShowGroupPanel = false;
+
+            panelControl1.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
         }
 
         private void SetEvent()
@@ -253,23 +258,98 @@ namespace DARTAuto
             if (!response.IsSuccessStatusCode) return;
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            string pattern = @"node1\['dcmNo'\] = ""\d+"";";
 
-            Match nodeData = Regex.Match(responseBody, pattern);
-            if (!nodeData.Success) return;
+            var htmlDocument = new HtmlAgilityPack.HtmlDocument();
+            htmlDocument.LoadHtml(responseBody);
 
-            pattern = @"\b\d{7}\b";
+            var head = htmlDocument.DocumentNode.SelectSingleNode("//head");
+            var scripts = head.SelectNodes("script");
+            var script = scripts[scripts.Count - 1];
 
-            nodeData = Regex.Match(nodeData.Value, pattern);
-            if (!nodeData.Success) return;
+            string pattern = @"(\w+)\['(\w+)'\]\s*=\s*""([^""]*)"";";
 
-            var form = new Form3(data.ToString(), nodeData.Value);
+            var matches = Regex.Matches(script.InnerText, pattern);
+
+            var list = new List<Node>();
+            Node node = new Node();
+            foreach (Match match in matches)
+            {
+                string objectName = match.Groups[1].Value;
+                string propertyName = match.Groups[2].Value;
+                string PropertyValue = match.Groups[3].Value;
+
+                switch (propertyName)
+                {
+                    case "text":
+                        node = new Node();
+                        node.text = PropertyValue;
+                        break;
+                    case "id":
+                        node.id = PropertyValue;
+                        break;
+                    case "rcpNo":
+                        node.rcpNo = PropertyValue;
+                        break;
+                    case "dcmNo":
+                        node.dcmNo = PropertyValue;
+                        break;
+                    case "eleId":
+                        node.eleId = PropertyValue;
+                        break;
+                    case "offset":
+                        node.offset = PropertyValue;
+                        break;
+                    case "length":
+                        node.length = PropertyValue;
+                        break;
+                    case "dtd":
+                        node.dtd = PropertyValue;
+                        break;
+                    case "tocNo":
+                        node.tocNo = PropertyValue;
+                        list.Add(node);
+                        break;
+                }
+            }
+
+            var form = new Form3(list);
             form.Show();
         }
 
         private void searchLookUpEdit1_EditValueChanged(object sender, EventArgs e)
         {
+            var dataTable = gridControl1.DataSource as DataTable;
+            dataTable.Rows.Clear();
             GetReportData();
+        }
+    }
+
+    public class Node
+    {
+        public string text = string.Empty;
+        public string id = string.Empty;
+        public string rcpNo = string.Empty;
+        public string dcmNo = string.Empty;
+        public string eleId = string.Empty;
+        public string offset = string.Empty;
+        public string length = string.Empty;
+        public string dtd = string.Empty;
+        public string tocNo = string.Empty;
+        public List<Node> children = new List<Node>();
+
+        public void Add(Node node)
+        {
+            children.Add(node);
+        }
+
+        public void Remove(Node node)
+        {
+            children.Remove(node);
+        }
+
+        public int Count
+        {
+            get { return children.Count; }
         }
     }
 }
