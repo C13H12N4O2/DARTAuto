@@ -61,3 +61,4 @@ C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.csproj.Core
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.csproj.CopyComplete
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.exe
 C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.pdb
+C:\Users\냐스퍼\source\repos\DARTAuto\DARTAuto\obj\Debug\DARTAuto.Form4.resources

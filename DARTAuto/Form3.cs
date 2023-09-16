@@ -20,9 +20,6 @@ namespace DARTAuto
 {
     public partial class Form3 : Form
     {
-        private const string length = "99999";
-        private const string offset = "99999";
-
         private List<Node> list;
         private Node node = new Node();
 
@@ -133,6 +130,7 @@ namespace DARTAuto
             labelControl4.Text = header[3].InnerText.Replace("&nbsp;", string.Empty);
 
             var tbody = table[1].SelectNodes(".//tbody");
+            bool flag = heads.Contains("주 석");
 
             for (int i = 0; i != tbody.Count; ++i)
             {
@@ -141,10 +139,24 @@ namespace DARTAuto
                 {
                     //var list = data.InnerText.Replace("&nbsp;", string.Empty).Replace("\r", string.Empty).Trim().Split('\n');
                     //var list = data.InnerText.Replace("&nbsp;", string.Empty).Trim().Split('\n');
-                    
+
                     string cleanedText = Regex.Replace(data.InnerText, @"^\s+|\s+$|&nbsp;", "", RegexOptions.Multiline);
                     cleanedText = Regex.Replace(cleanedText, @"\r\n+", "\r\n").Trim();
                     var list = cleanedText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (flag && (list.Length == 3))
+                    {
+                        var array = new string[list.Length + 1];
+                        array[0] = list[0];
+                        array[1] = "";
+
+                        for (int j = 1; j != list.Length; ++j)
+                        {
+                            array[j + 1] = list[j];
+                        }
+
+                        list = array;
+                    }
 
                     var row = dataTable.NewRow();
                     for (int j = 0; j != list.Length; ++j)
@@ -191,6 +203,7 @@ namespace DARTAuto
                     ++i;
                     continue;
                 }
+
                 double left = Convert.ToDouble(row.ItemArray[row.ItemArray.Length - 4]);
                 double right = Convert.ToDouble(row.ItemArray[row.ItemArray.Length - 3]);
 

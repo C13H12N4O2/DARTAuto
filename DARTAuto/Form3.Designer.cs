@@ -32,26 +32,26 @@
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
-            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
-            this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
-            this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl3 = new DevExpress.XtraEditors.LabelControl();
-            this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
-            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
-            this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
-            this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
             this.panelControl4 = new DevExpress.XtraEditors.PanelControl();
+            this.comboBoxEdit1 = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
+            this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
+            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
+            this.labelControl4 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
             this.panelControl2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).BeginInit();
+            this.panelControl4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).BeginInit();
             this.panelControl3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).BeginInit();
-            this.panelControl4.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelControl1
@@ -93,31 +93,6 @@
             this.panelControl2.Size = new System.Drawing.Size(1407, 189);
             this.panelControl2.TabIndex = 0;
             // 
-            // simpleButton1
-            // 
-            this.simpleButton1.Location = new System.Drawing.Point(41, 22);
-            this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(112, 34);
-            this.simpleButton1.TabIndex = 5;
-            this.simpleButton1.Text = "보고서 바로가기";
-            // 
-            // labelControl5
-            // 
-            this.labelControl5.Location = new System.Drawing.Point(25, 29);
-            this.labelControl5.Name = "labelControl5";
-            this.labelControl5.Size = new System.Drawing.Size(52, 22);
-            this.labelControl5.TabIndex = 4;
-            this.labelControl5.Text = "재무제표";
-            // 
-            // labelControl4
-            // 
-            this.labelControl4.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.labelControl4.Location = new System.Drawing.Point(2, 161);
-            this.labelControl4.Name = "labelControl4";
-            this.labelControl4.Size = new System.Drawing.Size(103, 22);
-            this.labelControl4.TabIndex = 3;
-            this.labelControl4.Text = "labelControl2";
-            // 
             // labelControl3
             // 
             this.labelControl3.Location = new System.Drawing.Point(634, 119);
@@ -126,13 +101,15 @@
             this.labelControl3.TabIndex = 3;
             this.labelControl3.Text = "labelControl2";
             // 
-            // labelControl2
+            // panelControl4
             // 
-            this.labelControl2.Location = new System.Drawing.Point(634, 70);
-            this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(103, 22);
-            this.labelControl2.TabIndex = 3;
-            this.labelControl2.Text = "labelControl2";
+            this.panelControl4.Controls.Add(this.comboBoxEdit1);
+            this.panelControl4.Controls.Add(this.labelControl5);
+            this.panelControl4.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panelControl4.Location = new System.Drawing.Point(2, 2);
+            this.panelControl4.Name = "panelControl4";
+            this.panelControl4.Size = new System.Drawing.Size(318, 185);
+            this.panelControl4.TabIndex = 7;
             // 
             // comboBoxEdit1
             // 
@@ -143,13 +120,13 @@
             this.comboBoxEdit1.Size = new System.Drawing.Size(150, 28);
             this.comboBoxEdit1.TabIndex = 2;
             // 
-            // labelControl1
+            // labelControl5
             // 
-            this.labelControl1.Location = new System.Drawing.Point(634, 24);
-            this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(103, 22);
-            this.labelControl1.TabIndex = 1;
-            this.labelControl1.Text = "labelControl1";
+            this.labelControl5.Location = new System.Drawing.Point(25, 29);
+            this.labelControl5.Name = "labelControl5";
+            this.labelControl5.Size = new System.Drawing.Size(52, 22);
+            this.labelControl5.TabIndex = 4;
+            this.labelControl5.Text = "재무제표";
             // 
             // panelControl3
             // 
@@ -161,15 +138,38 @@
             this.panelControl3.Size = new System.Drawing.Size(212, 185);
             this.panelControl3.TabIndex = 6;
             // 
-            // panelControl4
+            // simpleButton1
             // 
-            this.panelControl4.Controls.Add(this.comboBoxEdit1);
-            this.panelControl4.Controls.Add(this.labelControl5);
-            this.panelControl4.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panelControl4.Location = new System.Drawing.Point(2, 2);
-            this.panelControl4.Name = "panelControl4";
-            this.panelControl4.Size = new System.Drawing.Size(318, 185);
-            this.panelControl4.TabIndex = 7;
+            this.simpleButton1.Location = new System.Drawing.Point(41, 22);
+            this.simpleButton1.Name = "simpleButton1";
+            this.simpleButton1.Size = new System.Drawing.Size(112, 34);
+            this.simpleButton1.TabIndex = 5;
+            this.simpleButton1.Text = "보고서 바로가기";
+            // 
+            // labelControl4
+            // 
+            this.labelControl4.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.labelControl4.Location = new System.Drawing.Point(2, 161);
+            this.labelControl4.Name = "labelControl4";
+            this.labelControl4.Size = new System.Drawing.Size(103, 22);
+            this.labelControl4.TabIndex = 3;
+            this.labelControl4.Text = "labelControl2";
+            // 
+            // labelControl2
+            // 
+            this.labelControl2.Location = new System.Drawing.Point(634, 70);
+            this.labelControl2.Name = "labelControl2";
+            this.labelControl2.Size = new System.Drawing.Size(103, 22);
+            this.labelControl2.TabIndex = 3;
+            this.labelControl2.Text = "labelControl2";
+            // 
+            // labelControl1
+            // 
+            this.labelControl1.Location = new System.Drawing.Point(634, 24);
+            this.labelControl1.Name = "labelControl1";
+            this.labelControl1.Size = new System.Drawing.Size(103, 22);
+            this.labelControl1.TabIndex = 1;
+            this.labelControl1.Text = "labelControl1";
             // 
             // Form3
             // 
@@ -186,13 +186,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
             this.panelControl2.ResumeLayout(false);
             this.panelControl2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).EndInit();
+            this.panelControl4.ResumeLayout(false);
+            this.panelControl4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.comboBoxEdit1.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).EndInit();
             this.panelControl3.ResumeLayout(false);
             this.panelControl3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl4)).EndInit();
-            this.panelControl4.ResumeLayout(false);
-            this.panelControl4.PerformLayout();
             this.ResumeLayout(false);
 
         }
